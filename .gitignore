@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# IDE guff
+.idea
+cmake-build-debug
+cmake-build-release
