@@ -40,7 +40,7 @@ You'll most likely be using an IPU on a remote system. We have found huge benefi
 workflow through a modern IDE like CLion or VSCode, and setting yourself up to benefit from
 fast code editing, easy compilation, debugging and running of your IPU programs.
 
-[Setting up a productive workflow](productive-dev-workflow/README.md) shows you our setup for getting 
+[Setting up a productive workflow](productive-dev-workflow/) shows you our setup for getting 
 remote IPU development working through CLion. CLion requires you to structure your projects using the CMake build system. 
 
 If CMake isn't your thing, we should also say that we've used VSCode with great success, and you should use
@@ -50,7 +50,7 @@ However you set yourself up, make sure that you can achieve rapid feedback cycle
 ideas.
 
 ### Skeleton program
-The [Skeleton program](skeleton-program/README.md) is a useful, bare-bones program that includes code to
+The [Skeleton program](skeleton-program/) is a useful, bare-bones program that includes code to
 connect to an IPU Device, build a compute graph,
 incorporate some custom code, run this code on the IPU,
 and send and receive some data. It does nothing special, but it's a good starting point for your project.
@@ -62,7 +62,7 @@ TODO
 ### Testing
 Writing tests to validate the correctness of programs is a vital part of any serious development effort, and
 provides an satisfying safety net to check for regressions. In the
-[Testing](testing) tutorial we show how you can set up quick unit tests for your codelets, and run 
+[Testing](testing/) tutorial we show how you can set up quick unit tests for your codelets, and run 
 integration tests on both the IPUModel and on a real device.
 
 ### Timing program execution
@@ -106,7 +106,7 @@ TODO
 TODO
 
 ## When data is too big for the IPU: Using off-chip memory ("RemoteBuffers")
-In the [Using RemoteBuffers](using-remote-buffers/README.md) demo, we show how to use `RemoteBuffers` to enable IPUs to access dedicated off-chip RAM (which is also not
+In the [Using RemoteBuffers](using-remote-buffers/) demo, we show how to use `RemoteBuffers` to enable IPUs to access dedicated off-chip RAM (which is also not
 managed by the host program's OS). This allows us tackle problems requiring many GiB of memory. Poplar requires
 us to manage transfers from external RAM to the chip's SRAM manually - you can think of it as manual cache management
 using pre-compiled data movement. It means structuring programs a little differently, but with the help of the compiler,

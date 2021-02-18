@@ -9,8 +9,8 @@
 
 #include "CommonIpuUtils.hpp"
 
-constexpr auto NumElemsToTransfer = 60000;
-constexpr auto NumDataRepeats = 4;
+constexpr auto NumElemsToTransfer = 28000000;
+constexpr auto NumDataRepeats = 32;
 
 using namespace poplar;
 using namespace poplar::program;
@@ -128,7 +128,7 @@ int main() {
         engine.copyToRemoteBuffer(dataInKernelMemory, remoteBuffer1, i);
     }
 
-    engine.enableExecutionProfiling();
+    engine.disableExecutionProfiling();
 
     auto timer = ipu::startTimer("Running Program");
     engine.run(0);
@@ -145,11 +145,11 @@ int main() {
         };
     };
 
-    engine.printProfileSummary(std::cout,
-                               OptionFlags{
-                                       //  {"showVarStorage", "true"}
-                               }
-    );
+//    engine.printProfileSummary(std::cout,
+//                               OptionFlags{
+//                                       //  {"showVarStorage", "true"}
+//                               }
+//    );
 
     for (auto i = 0; i < NumDataRepeats; i++) {
         engine.copyFromRemoteBuffer(remoteBuffer0, dataInKernelMemory, i);
@@ -159,7 +159,7 @@ int main() {
         ipu::assertThat("chunk " + std::to_string(i) + " remoteBuffer 1 did not have the expected value everywhere",
                         everyValueInChunkIs(101 + i));
     }
-    ipu::captureProfileInfo(engine);
+    //ipu::captureProfileInfo(engine);
 
     delete[] dataInKernelMemory;
     return EXIT_SUCCESS;
