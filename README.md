@@ -65,6 +65,8 @@ provides an satisfying safety net to check for regressions. In the
 [Testing](testing) tutorial we show how you can set up quick unit tests for your codelets, and run 
 integration tests on both the IPUModel and on a real device.
 
+### Timing program execution
+
 ## Writing faster codelets
 TODO
 
@@ -100,8 +102,15 @@ approximately 6x. The recipes in this section show you how you to use multiple w
 
 ### When data naturally fits in tensors
 TODO
-### Sharing data structures between workers on a tile
+### Sharing data structures between workers on a tile using Supervisor Vertexes
 TODO
+
+## When data is too big for the IPU: Using off-chip memory ("RemoteBuffers")
+In the [Using RemoteBuffers](using-remote-buffers/README.md) demo, we show how to use `RemoteBuffers` to enable IPUs to access dedicated off-chip RAM (which is also not
+managed by the host program's OS). This allows us tackle problems requiring many GiB of memory. Poplar requires
+us to manage transfers from external RAM to the chip's SRAM manually - you can think of it as manual cache management
+using pre-compiled data movement. It means structuring programs a little differently, but with the help of the compiler,
+we can schedule co-operating IPUs to alternate between processing and transfer phases.
 
 ## Pattern: structured grids
 TODO
