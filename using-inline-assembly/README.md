@@ -1,10 +1,26 @@
 # Using inline assembly
+This recipe shows you how you might write some IPU assembly inline in a C++ vertex, by using `popc`'s support for the
+extended assembly (`__asm`) syntax.
 
+Before you start writing IPU assembly, make sure you've read the Poplar Vertex Assembly Programming guide, 
+and have access to the Tile Worker ISA (which explains
+the instructions that are availbale.) We can't give you access to the ISA -- please ask your Graphcore support engineer
+for access.
+
+You can also trawl the Poplibs source code on GitHub for ideas.
+
+
+## Why would you do this?!
 Sometimes you need to use some of the IPU's special instructions that haven't been exposed in an elegant way yet in the SDK.
 For example, in this example we'll show how to generate random numbers using the special hardware instructions.
 
-Before you do this, consider whether the well-tested SDK already supports your needs (e.g. in our case, maybe the `poprand` library
-could be used idiomatically). Even if it's not immediately apparent in the API documentation, the `popc` compiler also
+Before you do this, though, consider whether the well-tested SDK already supports your needs (e.g. in our case, maybe the `poprand` library
+could be used idiomatically).
+
+Every time you write assembly, your code gets less portable and more difficult to test, so use this as a last resort!
+
+## First check if there's some instrinsic function that already does what you need
+Even if it's not immediately apparent in the API documentation, the `popc` compiler also
 comes with some _intrinsics_ that might be exposing the functionality you need.
 
 You can inspect the intrinsics by looking at the strings in the `libpoplar.so` library. For example, in SDK v1.4
@@ -27,15 +43,10 @@ __builtin_ipu_urand32
 __builtin_ipu_urand64
 ```
 
-we see that there is already an intrinsic function for the code we're about to write (invoking the `urand32` instruction).
+We see that there is already an intrinsic function for the code we're about to write (invoking the `urand32` instruction).
 (_Note: in SDK v1.4 the `__builtin_ipu_urand32()` instrinsic actually returns an incorrect `float` - it should be using
-a subsequent `f32sufromui` operation to convert correctly to `float`. This is fixed in SDK v2+).
+a subsequent `f32sufromui` operation to convert correctly to `float`. This is fixed in SDK v2+_).
 
-Make sure you've read the Poplar Vertex Assembly Programming guide, and have access to the Tile Worker ISA (which explains
-the instructions that are availbale.) We can't give you access to the ISA -- please ask your Graphcore support engineer 
-for access.
-
-You can also trawl the Poplibs source code on GitHub for ideas.
 
 ### Using inline IPU assembly in a C++ vertex
 So now that the "don't do this unless you need to" warnings are out of the way, let's write some inline assembly.
@@ -58,8 +69,12 @@ public:
 };
 ```
 
-`popc` is LLVM-based, so we can use the LLVM and GCC extended assembly (`__asm`) syntax. You can find out more about that
-[here](https://www.felixcloutier.com/documents/gcc-asm.html), but of course most examples on the Internet are for
+Note that we've protected sections of IPU assembly by checking whether `__IPU__` is defined, which allows us to keep code portable 
+(e.g. be able to run your codelets on the `IPUModel`, or differentiate between `ipu1` and `ipu2` target code).
+
+`popc` is LLVM-based, so we can use the LLVM and GCC extended assembly (`__asm`) syntax. Information on the extended assembly syntax
+is thin on the ground, but there's a pretty good write-up 
+[here](https://www.felixcloutier.com/documents/gcc-asm.html). Most examples on the Internet are for
 x86, and it can be confusing to try and write this for the IPU instead.
 
 For the IPU, it's important to remember that 
@@ -69,19 +84,11 @@ For the IPU, it's important to remember that
 * Remember to mark the registers you use as clobbered.
 * Remember that some instructions only work with memory register operands (e.g. `$m0`), while others work with
   arithmetic register operands (e.g. `$a0`). You can use the `atom` instruction to move a result from one kind of register to the other.
-* Unlike x86 instructions, operands are either literals or all in registers; you don't have memory location operands.
+* Unlike some x86 instructions, operands are either literals or all in registers; you don't have memory location operands.
   So you need to use the load/store instructions (e.g. `ld32`) explicitly if you want to write something back to memory
-  from assembly.
+  from assembly. You can also capture outputs to C++ variables (or assembly inputs from C++ variables).
 * You can use multiple lines if you separate them with the `"\n\t"` syntax  
-* If you want to keep code portable (e.g. be able to run your codelets on the `IPUModel`), then you need to protect
-sections of IPU assembly like this:
-```C++
-#if defined(__IPU__) && defined(__POPC__)
-   // IPU assmbly goes here
-#else
-    // Maybe a C++ version or dummy values here?
-#endif
-```
+
    
 So let's take a look at a real example: generating a random uniform number that is a `float`. 
 1. We'll use the `urand32` instruction to generate a uniform random number that is a 32-bit `unsigned int`, and 
@@ -92,10 +99,10 @@ store the output in `$a0`.
 4. We'll tell the compiler that the contents of that `%[result]` memory register should go in the `tmp` C++ variable
 5. We'll let the compiler know that the `$a0` and `$a1` registers have been clobbered
 
-Note that if you actually want to use the random numbers, we should set up the PRNG registers appropriately, and using the
-`poprand` library functions is probably the easiest way.
+Note that if you actually want to generate random numbers, you should set up the PRNG registers appropriately, and using the
+`poprand` library functions is probably the easiest way. We don't show that here.
 
-
+Here's the final inline assembly code:
 
 ```C++
 public InlineAssemblyVertex: public Vertex {
@@ -120,6 +127,6 @@ public:
 };
 ```
 
-Good luck!
+Good luck, and remember to use this sparingly!
 
 
