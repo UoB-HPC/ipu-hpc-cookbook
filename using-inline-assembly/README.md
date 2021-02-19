@@ -54,7 +54,7 @@ This only makes sense from within Custom Vertexes (i.e. you wouldn't be doing th
 
 Say we have a basic C++ vertex:
 ```C++
-public InlineAssemblyVertex: public Vertex {
+class InlineAssemblyVertex: public Vertex {
 
 public:
     bool compute() {
@@ -93,19 +93,19 @@ For the IPU, it's important to remember that
 So let's take a look at a real example: generating a random uniform number that is a `float`. 
 1. We'll use the `urand32` instruction to generate a uniform random number that is a 32-bit `unsigned int`, and 
 store the output in `$a0`.
-2. We'll convert the 32-bit `unsigned int` to a `float` using the `f32sufromui` instruction, and store that in `$a1`
-3. We'll move the item in the `$a1` register to a memory register so that we can store it in a C++ variable. We'll call
-   that memory resister the assembly variable `%[result]`
+2. We'll convert the 32-bit `unsigned int` to a `float` using the `f32sufromui` instruction, and store that in the assembly variable `%[result]`
 4. We'll tell the compiler that the contents of that `%[result]` memory register should go in the `tmp` C++ variable
-5. We'll let the compiler know that the `$a0` and `$a1` registers have been clobbered
+5. We'll let the compiler know that the `$a0` register has been clobbered
 
-Note that if you actually want to generate random numbers, you should set up the PRNG registers appropriately, and using the
-`poprand` library functions is probably the easiest way. We don't show that here.
+Note that if you actually want to generate random numbers, you should set up the PRNG state registers appropriately, and using the
+`poprand` library functions is probably the easiest way. You'd also want to modify the PRNG state
+to avoid generating the same number over and over. We don't show that here, but the [poprand sources](https://github.com/graphcore/poplibs/blob/2bc6b6f3d40863c928b935b5da88f40ddd77078e/lib/poprand/codelets/asm/Seeds.S)
+show how this can be done.
 
 Here's the final inline assembly code:
 
 ```C++
-public InlineAssemblyVertex: public Vertex {
+class InlineAssemblyVertex: public Vertex {
 
 public:
     bool compute() {
@@ -114,11 +114,10 @@ public:
 #if defined(__IPU__) && defined(__POPC__)
         __asm(
                 "urand32 $a0\n\t"
-                "f32sufromui $a1, a0\n\t"
-                "atom %[result], $a1\n\t"
+                "f32sufromui %[result], a0\n\t"
         :[result]"=r"(tmp)
         :
-        :"$a0,$a1");
+        :"$a0");
 #else
         // Maybe a portable C++ version or dummy values here?
 #endif        
