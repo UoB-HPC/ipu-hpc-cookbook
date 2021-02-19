@@ -44,8 +44,8 @@ __builtin_ipu_urand64
 ```
 
 We see that there is already an intrinsic function for the code we're about to write (invoking the `urand32` instruction).
-(_Note: in SDK v1.4 the `__builtin_ipu_urand32()` instrinsic actually returns an incorrect `float` - it should be using
-a subsequent `f32sufromui` operation to convert correctly to `float`. This is fixed in SDK v2+_).
+(_Note: in SDK v1.4 the `__builtin_ipu_urand32()` instrinsic actually returns an incorrectly scaled `float` - it should be using
+a subsequent `f32sufromui` operation to convert correctly to `float`. This bug is confirmed as fixed in SDK v2+_).
 
 
 ### Using inline IPU assembly in a C++ vertex
