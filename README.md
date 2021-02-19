@@ -83,7 +83,8 @@ TODO
 TODO
 
 ### Including inline assembly
-TODO
+The [using-inline-assembly](./using-inline-assembly/) recipe shows you how you can write IPU assembly inline in a C++
+vertex using the extended assembly syntax supported by LLVM.
 
 ### Writing an Assembly vertex
 TODO
@@ -100,10 +101,14 @@ The IPU has 6 hardware worker threads that run in a time-sliced fashion. By sche
 in the same compute set, we can use task-based parallelism to hide instruction and memory latency and increase throughput
 approximately 6x. The recipes in this section show you how you to use multiple workers on each tile.
 
-### When data naturally fits in tensors
+### When data naturally fits in distinct tensors
 TODO
+
 ### Sharing data structures between workers on a tile using Supervisor Vertexes
-TODO
+Sometimes data is already in a tile's memory and we want to elegantly partition the data between the 6 workers in one
+compute set to "process it 6x as fast". For this, we can use a Supervisor Vertex, which instantiates workers with different
+offsets into common data.
+
 
 ## When data is too big for the IPU: Using off-chip memory ("RemoteBuffers")
 In the [Using RemoteBuffers](using-remote-buffers/) demo, we show how to use `RemoteBuffers` to enable IPUs to access dedicated off-chip RAM (which is also not
