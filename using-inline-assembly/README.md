@@ -2,26 +2,26 @@
 This recipe shows you how you might write some IPU assembly inline in a C++ vertex, by using `popc`'s support for the
 extended assembly (`__asm`) syntax.
 
-Before you start writing IPU assembly, make sure you've read the Poplar Vertex Assembly Programming guide, 
+Before you start writing IPU assembly, make sure you've read the [Poplar Vertex Assembly Programming Guide](https://docs.graphcore.ai/projects/assembly-programming/), 
 and have access to the Tile Worker ISA (which explains
-the instructions that are availbale.) We can't give you access to the ISA -- please ask your Graphcore support engineer
-for access.
+the instructions that are availbale.) 
 
-You can also trawl the Poplibs source code on GitHub for ideas.
+We can't give you access to the ISA docs -- please ask your Graphcore support engineer
+for access instead. You can also trawl the [Poplibs source code on GitHub](https://github.com/graphcore/poplibs) for ideas.
 
 
 ## Why would you do this?!
 Sometimes you need to use some of the IPU's special instructions that haven't been exposed in an elegant way yet in the SDK.
-For example, in this example we'll show how to generate random numbers using the special hardware instructions.
+For example, in this example we'll show how to generate random numbers using the special hardware instruction `urand32`.
 
-Before you do this, though, consider whether the well-tested SDK already supports your needs (e.g. in our case, maybe the `poprand` library
-could be used idiomatically).
+Before you do this, though, consider whether the well-tested SDK already supports your needs (e.g. in our case, 
+maybe the `poprand` library already has what we need, and could be used more idiomatically).
 
-Every time you write assembly, your code gets less portable and more difficult to test, so use this as a last resort!
+Every time you write assembly, your code gets less portable and more difficult to test, so use this only as a last resort!
 
 ## First check if there's some instrinsic function that already does what you need
 Even if it's not immediately apparent in the API documentation, the `popc` compiler also
-comes with some _intrinsics_ that might be exposing the functionality you need.
+comes with some [intrinsic functions](https://en.wikipedia.org/wiki/Intrinsic_function) that might be exposing the functionality you need.
 
 You can inspect the intrinsics by looking at the strings in the `libpoplar.so` library. For example, in SDK v1.4
 ```bash
@@ -127,6 +127,6 @@ public:
 };
 ```
 
-Good luck, and remember to use this sparingly!
+Good luck, and remember to use this sparingly.
 
 
