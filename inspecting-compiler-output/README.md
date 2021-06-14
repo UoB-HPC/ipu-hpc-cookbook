@@ -1,4 +1,4 @@
-#Inspecting compiler output
+# Inspecting compiler output
 
 
 ## POPC (Codelet compilation)
@@ -157,7 +157,7 @@ Now in compile.log you can see detail such as
 09:38:52.940 15288 PO:ENGINE   [I]     Starting phase: lowerControlFlow
 ```
 
-##References:
+## References:
 * Check out the docs for setting the environment variables at 
 https://docs.graphcore.ai/projects/poplar-user-guide/en/latest/env-vars.html
 

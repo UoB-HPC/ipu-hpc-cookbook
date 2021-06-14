@@ -1,4 +1,4 @@
-#Targeting the `IPUModel` emulator
+# Targeting the `IPUModel` emulator
 
 `IPUModel` devices allow you to develop and run your IPU code on 
 a CPU. This is great for getting started without a real IPU, or 
