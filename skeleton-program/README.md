@@ -1,1 +1,3 @@
-In progress, coming soon
+#A skeleton program for the IPU
+
+Coming soon!
