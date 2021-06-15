@@ -28,7 +28,7 @@ In this recipe, we will be "processing" a large chunk of data (>6GiB) that is to
 using 2 IPUs in a "Ping Pong" configuration so that one IPU is processing while another is streaming data. This avoids
 contention over the PCIe links and allows us to overlap communication and computation.
 
-![A screenshot from PopVision Graph Analyser showing the exection trace of the Ping Pong program on 2 IPUs][remote-buffer-ping-pong]
+![A screenshot from PopVision Graph Analyser showing the execution trace of the Ping Pong program on 2 IPUs][remote-buffer-ping-pong]
 
 [remote-buffer-ping-pong]: ./remote-buffer-ping-pong.png "Execution trace from the Ping Pong 2-IPU program"
 
