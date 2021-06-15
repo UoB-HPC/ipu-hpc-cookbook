@@ -9,14 +9,14 @@
 
 #include "CommonIpuUtils.hpp"
 
-constexpr auto NumIterations = 32000;
+constexpr auto NumIterations = 1000;
 
 using namespace poplar;
 using namespace poplar::program;
 
 int main() {
 
-    auto device = ipu::getIpuDevice(2);
+    auto device = ipu::getIpuDevice();
     if (!device.has_value()) {
         std::cerr << "Could not attach to IPU device. Aborting" << std::endl;
     }
@@ -29,7 +29,7 @@ int main() {
     auto data = graph.addVariable(FLOAT, {NumIterations}, "data"); // Where we will store the results
     poputil::mapTensorLinearly(graph, data);
 
-    auto latestResult = graph.addVariable(FLOAT, {NumIterations}, "latestResult");
+    auto latestResult = graph.addVariable(FLOAT, {}, "latestResult");
     graph.setTileMapping(latestResult, 0); // Store latest result on tile 0, it will be broadcast to all others
 
     // A dummy operation where we calculate a new value for
@@ -48,7 +48,7 @@ int main() {
     // Add an AppendValToGlobalArray to each tile. Only the one holding the slice of data that
     // matches the current iteration will write the latest value to the array
     auto appendResult = [&](Tensor &data, Tensor &latestResult) -> auto {
-        auto cs = graph.addComputeSet("processData");
+        auto cs = graph.addComputeSet("appendLatest");
         auto tileMapping = graph.getTileMapping(data);
         auto tileNum = 0;
         for (auto &tile : tileMapping) {
@@ -56,26 +56,31 @@ int main() {
                 auto from = chunk.begin();
                 auto to = chunk.end();
                 auto v = graph.addVertex(cs, "AppendValToGlobalArray", {
-                        {"results", data.slice(from, to)},
+                        {"results",       data.slice(from, to)},
                         {"currentResult", latestResult}
                 });
                 graph.setTileMapping(v, tileNum);
-                graph.setInitalValue(v["index"], 0);
-                graph.setInitalValue(v["myStartIndex"], from);
+                graph.setInitialValue(v["index"], 0);
+                graph.setInitialValue(v["myStartIndex"], from);
             }
             tileNum++;
         }
         return Execute(cs);
     };
 
-    const auto program =
-            Repeat(NumIterations ,
-                   Sequence{calculateLatestResult(latestResult),
-                            appendResult(data, latestResult)};
-            );
+    const auto program = Repeat(
+            NumIterations,
+            Sequence{calculateLatestResult(latestResult),
+                     appendResult(data, latestResult)
+            }
+    );
 
 
     auto engine = ipu::prepareEngine(graph, {program}, *device);
+
+    auto timer = ipu::startTimer("Runnng append program");
+    engine.run(0);
+    ipu::endTimer(timer);
 
     return EXIT_SUCCESS;
 }

@@ -19,9 +19,9 @@ public:
 
     auto compute() -> bool {
         const bool onOrAfterStartOfMyRange = (index >= myStartIndex);
-        const bool beforeEndOfMyRange = (index < myStartIndex + results.size())
+        const bool beforeEndOfMyRange = (index < myStartIndex + results.size());
         if (onOrAfterStartOfMyRange && beforeEndOfMyRange) {
-            results[index - myStartIndex] = latestResult;
+            results[index - myStartIndex] = *currentResult;
         }
         index++;
         return true;
@@ -34,7 +34,7 @@ class CalculateNextResult: public Vertex {
 public:
     Output<float> result;
     auto compute() -> bool {
-        result = result ^ 12345;
+        *result = *result * 1.001f;
         return true;
     }
 };
