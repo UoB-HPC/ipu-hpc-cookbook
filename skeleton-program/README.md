@@ -1,4 +1,4 @@
-#A skeleton program for the IPU
+# A skeleton program for the IPU
 
 Here we present all the code for a bare-bones Poplar IPU program that includes the following,
 often-repeated steps:
@@ -308,15 +308,6 @@ we just use
     engine.run(programIds["copy_to_host"]); // Copy from IPU
 ```
 
-You can see this reflected in the Execution trace view
-of the PopVision Graph Analyser tool:
-
-
-![A screenshot from PopVision Graph Analyser showing the execution trace of the Skeleton program on 1 IPUs][skeleton-program-trace]
-
-[skeleton-program-trace]: ./skeleton-execution-trace.png "Execution trace from the Skeleton program"
-
-
 ## Step 9: Capture debug and profile info
 ```C++
 auto serializeGraph(const Graph &graph) {
@@ -345,3 +336,13 @@ auto serializeGraph(const Graph &graph) {
  engine.printProfileSummary(std::cout,
                                    OptionFlags{{"showExecutionSteps", "false"}});
 ```
+
+
+You can see now view the output in the Execution trace view
+of the PopVision Graph Analyser tool. Note the 10 iterations in the execution block marked "loopBody".
+
+
+![A screenshot from PopVision Graph Analyser showing the execution trace of the Skeleton program on 1 IPUs][skeleton-program-trace]
+
+[skeleton-program-trace]: ./skeleton-execution-trace.png "Execution trace from the Skeleton program"
+
