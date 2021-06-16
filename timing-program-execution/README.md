@@ -1,4 +1,4 @@
-#Timing program execution
+# Timing program execution
 
 You're probably familiar with the simple method
 of timing program execution using usi ng some variant of:
