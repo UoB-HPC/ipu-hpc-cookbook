@@ -78,7 +78,7 @@ int main() {
 
     auto engine = ipu::prepareEngine(graph, {program}, *device);
 
-    auto timer = ipu::startTimer("Runnng append program");
+    auto timer = ipu::startTimer("Running append program");
     engine.run(0);
     ipu::endTimer(timer);
 
