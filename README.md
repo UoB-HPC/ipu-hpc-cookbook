@@ -116,7 +116,6 @@ data so that autovectorisation works better, and how to use directives
 which tell `popc` that memory is in different banks, allowing it to
 generate more efficient code.
 
-
 ### Preventing data rearrangements
 Attaching slices of tensors that include remotely-stored elements can be an elegant way
 to specify communication, but can also cause the compiler to introduce data rearrangements
@@ -145,16 +144,12 @@ Note that to make any real headway without guessing instruction formats, you'll 
 (<cite>[Graphcore Tile Worker ISA](#references)</cite>), which as far as we know,
 isn't generally publicly available, so you need to contact Graphcore for a copy.
 
-
 ### Including inline assembly
 The [Using inline assembly](./using-inline-assembly/) recipe shows you how you can write IPU assembly inline in a C++
-vertex using the extended assembly syntax supported by LLVM.
-
-### Writing an Assembly vertex
-Instead of writing a codelet in C++ and using some inline assembly, you might want to write a pure-assembly 
-vertex and compile it using `popc`. The [Writing an assembly vertex](writing-an-assembly-vertex)
-recipe shows you how.
-
+vertex using the extended assembly syntax supported by LLVM. This is useful if you
+want to access some hardware instructions directly, but keep most of your code in
+C++. We also show you how to see the list of compiler instrinsics, which may
+already cover your use case.
 
 ## Scheduling workers
 The IPU has 6 hardware worker threads that run in a time-sliced fashion. By scheduling multiple vertexes on the same tile
