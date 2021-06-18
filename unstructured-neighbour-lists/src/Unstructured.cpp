@@ -59,11 +59,11 @@ struct Partitioning {
 
 const Partitioning worker1 = {
         .localNodes = {0, 1},
-        .foreignNodes = {2, 3, 5},
+        .foreignNodes = {2, 3, 4},
         .localEdges =  {{0, 1},
                         {1, 2},
-                        {2, 3}},
-        .foreignEdges = {{0, 5}}
+                        {1, 3}},
+        .foreignEdges = {{0, 4}}
 };
 
 const Partitioning worker2 = {
@@ -81,7 +81,7 @@ const Partitioning worker3 = {
         .foreignNodes = {2, 3, 0},
         .localEdges =  {{2, 5},
                         {4, 5},
-                        {0, 5}},
+                        {0, 4}},
         .foreignEdges = {{3, 5}}
 };
 
@@ -98,6 +98,15 @@ int numNeighbours(int node) {
     return count;
 }
 
+// Set MS bit
+auto markLocal = [](unsigned int in) -> unsigned int {
+    return in | 0x8000000u;
+};
+
+// Clear MS bit
+auto markForeign = [](unsigned int in) -> unsigned int {
+    return in & 0x7FFFFFFFu;
+};
 
 std::vector<unsigned int> edgeMapForNode(const Node node, const Partitioning &partitioning) {
     auto result = std::vector<unsigned int>();
@@ -105,12 +114,54 @@ std::vector<unsigned int> edgeMapForNode(const Node node, const Partitioning &pa
         UNUSED(v);
         auto[from, to] = k;
         if (from == node) {
-// TODO GOT HERE!
-// Figure out if its in the local or foreign list and where
-            auto toAndIndicator = to;
-            result.push_back(toAndIndicator);
-            auto edgeIdxAndIndicator = 0;
-            result.push_back(edgeIdxAndIndicator);
+            std::cout << "(" << from << "," << to << "):" << std::endl;
+            auto encodedToNodeVal = [&](const unsigned int toNodeId) -> unsigned int {
+                auto localNodeIdx = std::find(std::begin(partitioning.localNodes),
+                                              std::end(partitioning.localNodes),
+                                              toNodeId);
+                auto foreignNodeIdx = std::find(std::begin(partitioning.foreignNodes),
+                                                std::end(partitioning.foreignNodes),
+                                                toNodeId);
+                auto toNodeIsLocal = (localNodeIdx != std::end(partitioning.localNodes));
+                auto toNodeIsForeign = (foreignNodeIdx != std::end(partitioning.foreignNodes));
+                assert(toNodeIsLocal || toNodeIsForeign);
+                if (toNodeIsLocal) {
+                    return markLocal(*localNodeIdx);
+                } else {
+                    return markForeign(*foreignNodeIdx);
+                }
+            }(to);
+
+            auto encodedEdgeVal = [&](const Edge &edge) -> unsigned int {
+                auto localEdgeIdx = std::find(std::begin(partitioning.localEdges),
+                                              std::end(partitioning.localEdges),
+                                              edge);
+                auto reversedEdge = Edge(std::get<1>(edge), std::get<0>(edge));
+                if (localEdgeIdx == std::end(partitioning.localEdges)) {
+                    localEdgeIdx = std::find(std::begin(partitioning.localEdges),
+                                             std::end(partitioning.localEdges),
+                                             reversedEdge);
+                }
+                auto foreignEdgeIdx = std::find(std::begin(partitioning.foreignEdges),
+                                                std::end(partitioning.foreignEdges),
+                                                edge);
+                if (foreignEdgeIdx == std::end(partitioning.foreignEdges)) {
+                    foreignEdgeIdx = std::find(std::begin(partitioning.foreignEdges),
+                                               std::end(partitioning.foreignEdges),
+                                               reversedEdge);
+                }
+                auto edgeIsLocal = (localEdgeIdx != std::end(partitioning.localEdges));
+                auto edgeIsForeign = (foreignEdgeIdx != std::end(partitioning.foreignEdges));
+                assert(edgeIsLocal || edgeIsForeign);
+                if (edgeIsLocal) {
+                    return markLocal(localEdgeIdx - std::begin(partitioning.localEdges));
+                } else {
+                    return markForeign(foreignEdgeIdx - std::begin(partitioning.foreignEdges));
+                }
+            }(k);
+
+            result.push_back(encodedToNodeVal);
+            result.push_back(encodedEdgeVal);
         }
     }
     return result;
@@ -130,6 +181,7 @@ int main() {
 
     auto emptyList = graph.addVariable(FLOAT, {},
                                        "empty"); // We *might* have empty node or edge lists but still need to wire up something
+    graph.setTileMapping(emptyList, 100);
     auto nodeValuesA = graph.addVariable(FLOAT, {NumNodes, NodeDim}, "nodes"); // Nodal values (float[3]'s)
     auto edgeWeightsA = graph.addVariable(FLOAT, {NumEdges, 1}, "edgeWeights"); // Edge weights (float)
 
@@ -141,6 +193,7 @@ int main() {
     auto workerVertex = [&](ComputeSet &cs, Tensor &nodesIn, Tensor &nodesOut, Tensor &edgesIn,
                             Tensor &edgesOut, const Partitioning &partitioning,
                             const std::string &name, const int tileToPlaceNewVars) -> auto {
+        std::cout << "Setting up vertex for " << name << " on tile " << tileToPlaceNewVars << std::endl;
         auto localNodes = [&]() {
             if (partitioning.localNodes.size() > 0) {
                 auto tensors = std::vector<Tensor>(partitioning.localNodes.size());
@@ -254,9 +307,6 @@ int main() {
                                                  connectivityMapName);
         graph.setTileMapping(connectivityIndex, tileToPlaceNewVars);
         graph.setTileMapping(connectivityMap, tileToPlaceNewVars);
-
-
-        // TODO these will need to be placed on tiles!
 
         auto v = graph.addVertex(cs, "UpdateVertex", {
                 {"localNodes",        localNodes},
