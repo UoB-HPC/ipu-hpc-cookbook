@@ -1,5 +1,11 @@
 # Structured halo exchange
 
+![Halo exchange][halo-exchange]
+
+[halo-exchange]: ./structured-halo-exchange.png "Halo exchange"
+
+
+
 # Implicit halo exchange: the most idiomatic/elegant
 * Wire up duplicated/overlapping regions to inputs if codelets to instruct
 compiler to copy data for halos
