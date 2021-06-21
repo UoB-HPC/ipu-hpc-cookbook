@@ -11,18 +11,6 @@
 
 using namespace poplar;
 
-auto randf() -> float {
-    float result;
-    // The assembly code doesn't work!
-#if defined(__IPU__) && defined(__POPC__)
-    __asm__("urand32 $a0");
-        __asm__("f32sufromui $a1, $a0");
-        __asm__("st32 $a1, $m11, $m15, 0");
-        result = abs(result) / PARTICLE_MAX_FLOAT;
-#endif
-    return result;
-}
-
 
 inline auto asTileData(void *ref) -> TileData *const {
     return reinterpret_cast<TileData *const>(ref);

@@ -1,10 +1,13 @@
-# Complex local data structures
+#include <poplar/Vertex.hpp>
+#include <cstddef>
+#include <cstdlib>
+#include <print.h>
+#include <math.h>
+#include <ipudef.h>
+#include <stdint.h>
+#include <assert.h>
+#include <cmath>
 
-## What is possible in vertexes?
-
-The documentation at the moment is a little lacking, but if we write a program to test:
-
-```C++
 using MyOwnStructType = struct {float a, int b};
 
 class WhatIsAllowedVertex : public Vertex {
@@ -43,54 +46,3 @@ public:
         return true;
     }
 };
-```
-
-## Our approach: `reinterpret_cast`ing `Input<Vector<char>>`
-Maybe we have a 'complex' data structure something like this:
-```C++
-
-using TileData = struct {
-    int numParticles;
-    int nextToShed;
-    int nextIndexToConsider;
-    Bounds local;
-    Bounds global;
-    Particle particles[MaxNumParticles];
-    int numProcessors;
-    int myRank;
-    int particlesShedThisIter;
-    int particlesAcceptedThisIter;
-    int offeredToMeThisIter;
-};
-```
-
-
-```C++
-inline auto asTileData(void *ref) -> TileData *const {
-    return reinterpret_cast<TileData *const>(ref);
-}
-```
-
-
-Each vertex starts off with:
-
-```C++
-class SomeVertex : public Vertex {
-public:
-    Input <Vector<char, VectorLayout::ONE_PTR>> data; // Just use chars and cast later
-    ...
-    bool compute() {
-        auto tileData = asTileData(&data[0]);       
-        // and use normally
-        tileData->particlesShedThisIter = 0;                                      
-```
-
-
-* We can fill the structure host-side
-* The vertex is just wired up with `char` and the buffer is pre-allocated to
-  be a chunk of tile memory (static size)
-  
-
-```
-
-```
