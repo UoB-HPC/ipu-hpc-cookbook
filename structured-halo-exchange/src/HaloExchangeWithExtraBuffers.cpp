@@ -342,8 +342,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Sending initial data..." <<
               std::endl;
     engine.run(0); // Copy to device
-
+    std::cout << "Initialising..." <<
+              std::endl;
     engine.run(1);
+
 
 
 

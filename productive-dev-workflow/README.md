@@ -46,6 +46,8 @@ PYTHONPATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bb
 
 (replace `your_username` and the path to the poplar SDK you have installed)
 
+* Also remember to modify the LD_LIBRARY_PATH env var for your runnable target
+  configuratiin to include the path to the Graphcore libs
 
 ![An example of setting up remote cmake paths][remote-cmake-paths]
 

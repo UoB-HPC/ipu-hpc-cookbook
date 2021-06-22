@@ -1,7 +1,13 @@
 # Structured halo exchange
+
+For a fuller discussion of the brief notes we present here, please see Chapters 3 and 5
+of Thorben Louw's MSc thesis [here](./StructuredGridHaloExchange.pdf).
+
 ![Halo exchange][halo-exchange]
 
 [halo-exchange]: ./structured-halo-exchange.png "Halo exchange"
+
+
 
 
 # Double-buffered implicit halo exchange: the most idiomatic/elegant
@@ -23,7 +29,10 @@ of partitions to store the halos
 * Vertex code is much more complex
 
 # Explicit halo exchange with copies grouped into directional 'waves'
-* Say more
+* The order in which the explicit copies are performed has a massive performance
+impact. 
+* We can use existing "2-wave" optimisations to reduce the number of copies required
+
 
 The difference between these  approaches is shown in [this example](src/HaloRegionApproaches.cpp),
 with its [codelets](src/codelets/HaloRegionApproachesCodelets.cpp).
