@@ -223,3 +223,7 @@ with Poplar's compiled communication approach, but we show one way to work aroun
 [1] Williams, Samuel, Andrew Waterman, and David Patterson. <cite>"Roofline: an insightful visual performance model for multicore architectures."</cite> Communications of the ACM 52.4 (2009): 65-76.
 
 [2] Graphcore, Tile Worker ISA, Release 1.1.3
+
+
+# Acknowledgements
+Some of the examples use Jarryd Beck's [cxxopts](https://github.com/jarro2783/cxxopts) library for options parsing.

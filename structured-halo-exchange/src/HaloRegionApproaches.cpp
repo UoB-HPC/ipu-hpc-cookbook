@@ -1,7 +1,5 @@
-
-
 #include <cstdlib>
-#include <cxxopts.hpp>
+#include "cxxopts.hpp"
 #include "StructuredGridUtils.hpp"
 #include <chrono>
 #include "GraphcoreUtils.hpp"
@@ -23,7 +21,7 @@ auto fill(Graph &graph, const Tensor &tensor, const float value, const unsigned 
                                      {"val",    value}
                              }
     );
-    graph.setCycleEstimate(v, 100);
+    graph.setPerfEstimate(v, 100);
     graph.setTileMapping(v, tileNumber);
 }
 
@@ -144,7 +142,7 @@ auto implicitStrategy(Graph &graph, const unsigned numTiles,
                                              {"out", block(out, 0, 0)}
                                      }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
             v = graph.addVertex(compute2,
                                 "IncludedHalosApproach<float>",
@@ -153,7 +151,7 @@ auto implicitStrategy(Graph &graph, const unsigned numTiles,
                                         {"out", block(in, 0, 0)}
                                 }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
         }
         return Sequence(Execute(compute1), Execute(compute2));
@@ -327,7 +325,7 @@ auto explicitManyTensorStrategy(Graph &graph, const unsigned numTiles,
                                              {"out", blocksForIncludedHalosOut[tile]},
                                      }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
             v = graph.addVertex(compute2,
                                 "IncludedHalosApproach<float>",
@@ -336,7 +334,7 @@ auto explicitManyTensorStrategy(Graph &graph, const unsigned numTiles,
                                         {"out", blocksForIncludedHalosIn[tile]},
                                 }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
         }
 
@@ -496,7 +494,7 @@ auto explicitOneTensorStrategy2Wave(Graph &graph, const unsigned numTiles,
                                              {"out", block(expandedOut)},
                                      }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
             v = graph.addVertex(compute2,
                                 "IncludedHalosApproach<float>",
@@ -505,7 +503,7 @@ auto explicitOneTensorStrategy2Wave(Graph &graph, const unsigned numTiles,
                                         {"in",  block(expandedOut)},
                                 }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
         }
 
@@ -715,7 +713,7 @@ auto explicitOneTensorStrategy(Graph &graph, const unsigned numTiles,
                                              {"out", block(expandedOut)},
                                      }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
             v = graph.addVertex(compute2,
                                 "IncludedHalosApproach<float>",
@@ -724,7 +722,7 @@ auto explicitOneTensorStrategy(Graph &graph, const unsigned numTiles,
                                         {"in",  block(expandedOut)},
                                 }
             );
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
         }
 

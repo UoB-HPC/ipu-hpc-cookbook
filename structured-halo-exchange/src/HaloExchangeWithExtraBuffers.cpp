@@ -143,7 +143,7 @@ auto haloExchange(Graph &graph, std::map<std::string, Tensor> tensors) -> Sequen
                                          {"data", tensors["tileData"][tileNum]},
                                          {"halo", tensors["haloForNeighbours"][tileNum]}
                                  });
-        graph.setCycleEstimate(v, NumCellsInTileSide * 4);
+        graph.setPerfEstimate(v, NumCellsInTileSide * 4);
         graph.setTileMapping(v, tileNum);
     }
     result.add(Execute(packHaloCs));
@@ -228,14 +228,14 @@ auto haloExchange(Graph &graph, std::map<std::string, Tensor> tensors) -> Sequen
                                          {"data", tensors["tileData"][tileNum]},
                                          {"halo", tensors["haloFromNeighbours"][tileNum]}
                                  });
-        graph.setCycleEstimate(v, NumCellsInTileSide * 3);
+        graph.setPerfEstimate(v, NumCellsInTileSide * 3);
         graph.setTileMapping(v, tileNum);
         v = graph.addVertex(unpackHaloCs, "UnpackHaloTop",
                             {
                                     {"data", tensors["tileData"][tileNum]},
                                     {"halo", tensors["haloFromNeighbours"][tileNum]}
                             });
-        graph.setCycleEstimate(v, NumCellsInTileSide);
+        graph.setPerfEstimate(v, NumCellsInTileSide);
         graph.setTileMapping(v, tileNum);
     }
     result.add(Execute(unpackHaloCs));
@@ -254,7 +254,7 @@ auto initialise(Graph &graph, std::map<std::string, Tensor> tensors) -> Sequence
                                  });
         graph.setInitialValue(v["numRows"], NumCellsInTileSide);
         graph.setInitialValue(v["numCols"], NumCellsInTileSide);
-        graph.setCycleEstimate(v, 2);
+        graph.setPerfEstimate(v, 2);
         graph.setTileMapping(v, tileNum);
     }
     result.add(Execute(initCs));
@@ -277,7 +277,7 @@ auto stencil(Graph &graph, std::map<std::string, Tensor> tensors) -> Sequence {
 
             graph.setInitialValue(v["threadRowFrom"], from);
             graph.setInitialValue(v["threadRowTo"], to);
-            graph.setCycleEstimate(v, NumCellsInTileSide * NumCellsInTileSide * 4 / NumWorkers);
+            graph.setPerfEstimate(v, NumCellsInTileSide * NumCellsInTileSide * 4 / NumWorkers);
             graph.setTileMapping(v, tileNum);
         }
     }
@@ -288,7 +288,7 @@ auto stencil(Graph &graph, std::map<std::string, Tensor> tensors) -> Sequence {
 int main(int argc, char *argv[]) {
 
 //    auto device = std::optional<Device>{getIpuModel()};
-    auto device = getIpuDevice(NumIpus);
+    auto device = ipu::getIpuDevice(NumIpus);
     device = device->createVirtualDevice(TotalNumTilesToUse / NumIpus);
     if (!device.has_value()) {
         std::cerr << "Could not attach to IPU device. Aborting" << std::endl;
@@ -301,22 +301,19 @@ int main(int argc, char *argv[]) {
 
     auto tensors = createAndMapTensors(graph);
 
-    auto dataToDevice = graph.addHostToDeviceFIFO(">>data", CHAR, 100 * TotalNumTilesToUse,
+    auto dataToDevice = graph.addHostToDeviceFIFO(">>data", CHAR, BufferSize * TotalNumTilesToUse,
                                                   ReplicatedStreamMode::REPLICATE, {
 
 //                {"bufferingDepth", "100"},
 //                {"splitLimit", "0"},
 
                                                   });
-    auto dataFromDevice = graph.addDeviceToHostFIFO("<<data", CHAR, 100 *
+    auto dataFromDevice = graph.addDeviceToHostFIFO("<<data", CHAR, BufferSize *
                                                                     TotalNumTilesToUse); // Maybe we want lots of different ones of these?
 
-    auto offset = graph.addVariable(INT, {1}, VariableMappingMethod::LINEAR);
-    graph.setInitialValue(offset, 0);
-    auto copyBackToHost = Copy(tensors["tileData"], dataFromDevice, offset, false, {},
-                               DebugContext{"Making the CopyBacktoHost"});
-    auto copyToDevice = Copy(dataToDevice, tensors["chunk"], offset, false, {},
-                             DebugContext{"Making the Copy to device"});
+
+    auto copyBackToHost = Copy(tensors["tileData"], dataFromDevice);
+    auto copyToDevice = Copy(dataToDevice, tensors["tileData"]);
 
 
     Sequence initProgram = initialise(graph, tensors);
@@ -328,8 +325,8 @@ int main(int argc, char *argv[]) {
     auto tic = std::chrono::high_resolution_clock::now();
 
 
-    auto engine = Engine(graph, {copyToDevice},
-                         POPLAR_ENGINE_OPTIONS_DEBUG, progressFunc);
+    auto engine = Engine(graph, {copyToDevice, initProgram, timestepProgram, copyBackToHost},
+                         ipu::POPLAR_ENGINE_OPTIONS_DEBUG);
 
     auto toc = std::chrono::high_resolution_clock::now();
     auto diff = std::chrono::duration_cast<std::chrono::duration<double >>(toc - tic).count();
@@ -339,17 +336,15 @@ int main(int argc, char *argv[]) {
     engine.load(*device);
     engine.disableExecutionProfiling();
 
+    auto dataBuf = std::make_unique<std::vector<char>>(BufferSize * TotalNumTilesToUse * 20);
 
-    initialiseAllTileData(dataBuf, TotalNumTilesToUse);
+    initialiseAllTileData(dataBuf->data(), TotalNumTilesToUse);
     std::cout << "Sending initial data..." <<
               std::endl;
+    engine.run(0); // Copy to device
 
-    engine.run(0);
-    engine.run(2);
+    engine.run(1);
 
-    engine.run(2); // Copy back
-
-    deserialiseToFile(dataBuf, 0);
 
 
     for (int iter = 1; iter <= MaxIters; iter++) {
@@ -360,23 +355,20 @@ int main(int argc, char *argv[]) {
 
         }
         tic = std::chrono::high_resolution_clock::now();
-        engine.run(1);
+        engine.run(2);
         toc = std::chrono::high_resolution_clock::now();
         if (iter == 2) {
             engine.disableExecutionProfiling();
-            captureProfileInfo(engine);
+            ipu::captureProfileInfo(engine);
         }
 
 
         diff = std::chrono::duration_cast<std::chrono::duration<double >>(toc - tic).count();
         std::cout << " took " << std::right << std::setw(12) << std::setprecision(5) << diff << "s" <<
                   std::endl;
-        engine.run(2); // Copy back
+        engine.run(3); // Copy back
 
-        deserialiseToFile(dataBuf, iter);
     }
-
-    delete dataBuf;
 
     return EXIT_SUCCESS;
 }

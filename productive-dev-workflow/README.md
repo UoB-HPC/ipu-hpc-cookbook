@@ -31,6 +31,21 @@ IDE autocomplete,
  the CMAKE_PREFIX_PATH includes the path to the poplar libraries as show in the image below
 
 
+ours is
+
+```
+POPLAR_ROOT=/home/thorbenl/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64
+CMAKE_PREFIX_PATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64;
+LIBRARY_PATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64/lib:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/lib;
+LD_LIBRARY_PATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64/lib:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/lib;
+POPLAR_SDK_ENABLED=/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64;
+CPATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64/include:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/include;
+OMPI_CPPFLAGS=-I/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/include/openmpi;
+PYTHONPATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64/python:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/python:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/lib/python
+```
+
+(replace `your_username` and the path to the poplar SDK you have installed)
+
 
 ![An example of setting up remote cmake paths][remote-cmake-paths]
 

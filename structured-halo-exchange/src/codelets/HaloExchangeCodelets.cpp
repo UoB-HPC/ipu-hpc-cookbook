@@ -40,6 +40,11 @@ public:
         tileData->numRows = numRows;
         tileData->numCols = numCols;
         tileData->writeScheme = 0;
+        for (int i = 0; i < NumCellsInTileSide + 2; i++) {
+            for (int j = 0; j < NumCellsInTileSide + 2; j++) {
+               tileData->cells[i * (NumCellsInTileSide + 2)  + j] = 0.f;
+            }
+        }
         return true;
     }
 };
