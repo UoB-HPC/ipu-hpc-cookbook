@@ -205,7 +205,7 @@ data structure. This form of scheduling is demonstrated in
 [Scheduling multiple workers that share data](scheduling-multiple-workers-that-share-data/).
 
 ## When data is too big for the IPU: Using off-chip memory ("RemoteBuffers")
-In the [Using RemoteBuffers](using-remote-buffers/) demo, we show how to use `RemoteBuffers` to enable IPUs to access dedicated off-chip RAM (which is also not
+In the [Using RemoteBuffers](using-remote-buffers/) demo, we show how to use `RemoteBuffers` (also called "Streaming Memory" in Graphcore materials) to enable IPUs to access dedicated off-chip RAM (which is also not
 managed by the host program's OS). This allows us tackle problems requiring many GiB of memory. Poplar requires
 us to manage transfers from external RAM to the chip's SRAM manually - you can think of it as manual cache management
 using pre-compiled data movement. It means structuring programs a little differently, but with the help of the compiler,
