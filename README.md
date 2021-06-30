@@ -41,6 +41,7 @@ won't be very helpful to you.
   * [Pattern: unstructured grids](#pattern--unstructured-grids)
     + [Neighbour lists](#neighbour-lists)
   * [General Recipes](#general-recipes)
+    + [Evaluating memory bandwidth](#evaluating-memory-bandwidth)
     + [Appending values to a global distributed array](#appending-values-to-a-global-distributed-array)
     + [Efficient streaming of data from the host](#efficient-streaming-of-data-from-the-host)
     + [Pipelined wavefront execution](#pipelined-wavefront-execution)
@@ -237,6 +238,14 @@ We demonstrate how a simple unstructured grid code can be implemented on the IPU
 
 
 ## General Recipes
+
+### Evaluating memory bandwidth
+We used the [BabelStream](https://github.com/UoB-HPC/BabelStream) benchmark, with our implementation for Poplar [here](https://github.com/thorbenlouw/BabelStream/blob/master/PoplarKernels.cpp).
+Understanding the achievable fraction of STREAM that can be obtained is
+much more useful than blindly following the IPU data sheets, which claim 47TB/s memory bandwidth for the
+tile SRAM memories. For a STREAM-type kernel, our achievable results are closer to 8TB/s for optimised, vectorised
+C++ vertices on the Mk1 IPU.
+
 ### Appending values to a global distributed array
 Sometimes you need to collect values to an array over the course of many iterations, and want to hold them in the
 IPU memory rather than writing them back each iteration. We demonstrate an approach to this in
