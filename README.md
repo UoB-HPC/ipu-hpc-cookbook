@@ -1,9 +1,9 @@
-# ipu-hpc-cookbook
+# An HPC Cookbook for the Graphcore IPU
 We've had an increasing number of questions about how we've used the
 Graphcore Intelligence Processing Unit (IPU) for our HPC work. The IPU is a new platform, and
 most of the help 
 and documentation for it is aimed at its core application domain: Machine Learning. 
-So for other workflows, such as n-body simulation or structured/unstructued
+So for other workflows, such as n-body simulation or structured/unstructured
 grid codes, it can be difficult to figure out how to achieve your programming aims.
 We hope this repository can help you get started!
 
@@ -12,6 +12,41 @@ Please feel free to contribute by submitting pull requests or raising issues.
 Please note that this repository will be aimed at low-level (i.e. Poplar) C++
 code for the IPU. If you're looking for help with your Tensorflow or PyTorch project, it
 won't be very helpful to you.
+
+
+- [Table of Contents](#an-hpc-cookbook-for-the-graphcore-ipu)
+  * [Basics](#basics)
+    + [The Poplar SDK](#the-poplar-sdk)
+    + [If you haven't got access to an IPU](#if-you-haven-t-got-access-to-an-ipu)
+    + [A productive development workflow](#a-productive-development-workflow)
+    + [Skeleton program](#skeleton-program)
+    + [IPUModel (emulator)](#ipumodel--emulator-)
+    + [Testing](#testing)
+    + [Timing program execution](#timing-program-execution)
+  * [Writing faster codelets](#writing-faster-codelets)
+    + [Inspecting compiler output](#inspecting-compiler-output)
+    + [Encouraging auto-vectorisation](#encouraging-auto-vectorisation)
+    + [Manual vectorisation](#manual-vectorisation)
+    + [Alignment](#alignment)
+    + [Preventing data rearrangements](#preventing-data-rearrangements)
+    + [Representing complex local data structures](#representing-complex-local-data-structures)
+  * [Assembly vertexes](#assembly-vertexes)
+    + [Including inline assembly](#including-inline-assembly)
+  * [Scheduling workers](#scheduling-workers)
+    + [When data naturally fits in distinct tensors](#when-data-naturally-fits-in-distinct-tensors)
+    + [Sharing data structures between workers on a tile using MultiVertexes](#sharing-data-structures-between-workers-on-a-tile-using-multi-vertexes)
+  * [When data is too big for the IPU: Using off-chip memory ("RemoteBuffers")](#when-data-is-too-big-for-the-ipu--using-off-chip-memory---remotebuffers--)
+  * [Pattern: structured grids](#pattern--structured-grids)
+    + [Halo exchange](#halo-exchange)
+  * [Pattern: unstructured grids](#pattern--unstructured-grids)
+    + [Neighbour lists](#neighbour-lists)
+  * [General Recipes](#general-recipes)
+    + [Appending values to a global distributed array](#appending-values-to-a-global-distributed-array)
+    + [Efficient streaming of data from the host](#efficient-streaming-of-data-from-the-host)
+    + [Pipelined wavefront execution](#pipelined-wavefront-execution)
+    + [Sending variable amounts of data to neighbouring tiles](#sending-variable-amounts-of-data-to-neighbouring-tiles)
+- [References](#references)
+- [Acknowledgements](#acknowledgements)
 
 
 ## Basics
@@ -107,12 +142,12 @@ should you how to get some better performance automatically.
 
 ### Manual vectorisation
 The [Manual Vectorisation](manual-vectorisation/) recipe shows you how to use
-the intrinsics and vectorised datatypes like `float2` and `half4` that can easily
+the intrinsics and vectorised data types like `float2` and `half4` that can easily
 boost a unvectorised program's execution by up to 4x.
 
 ### Alignment
 The [Alignment](alignment/) recipe shows you how to align vectors of
-data so that autovectorisation works better, and how to use directives
+data so that auto-vectorisation works better, and how to use directives
 which tell `popc` that memory is in different banks, allowing it to
 generate more efficient code.
 
@@ -160,12 +195,12 @@ approximately 6x. The recipes in this section show you how you to use multiple w
 The [Scheduling multiple workers per tile](scheduling-multiple-workers-per-tile/) recipe shows
 you how to schedule multiple workers per tile to keep all 6 hardware worker threads busy. This
 idiomatic way of scheduling is perfect when each worker can "own" its own data and
-communicate only by sharing.
+communicates with other workers using the normal mechanisms (`Copy` or wiring up overlapping tensor slices).
 
-### Sharing data structures between workers on a tile using Supervisor Vertexes
+### Sharing data structures between workers on a tile using Multi-vertexes
 Sometimes complex (e.g. graph) data is already in a tile's memory, but we want to elegantly partition the data between the 6 workers in one
-compute set to "process it 6x as fast". For this, we can use a Supervisor Vertex, which instantiates workers with different
-offsets, but which reference a common data data structure. This non-idiomatic scheduling is demonstrated in
+compute set to "process it 6x as fast". For this, we can use a Multi-Vertex, which instantiates workers with different workerIds, but which reference a common data 
+data structure. This form of scheduling is demonstrated in
 [Scheduling multiple workers that share data](scheduling-multiple-workers-that-share-data/).
 
 ## When data is too big for the IPU: Using off-chip memory ("RemoteBuffers")
@@ -197,7 +232,7 @@ and the cartesian concepts such as "my left neighbour" are replaced with edge li
 connections between nodes.
 
 ### Neighbour lists
-We demonstrate how a simple unstructured grid code can be implemeented on the IPU in
+We demonstrate how a simple unstructured grid code can be implemented on the IPU in
 [Unstructured Neighbour Lists](unstructured-neighbour-lists/).
 
 
