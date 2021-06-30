@@ -39,6 +39,10 @@ slice sizes per worker, otherwise there will be load imbalance, and
 workers that finish faster will just be waiting for the overloaded workers
 to finish before they can all sync at the end of the BSP step.
 
+Of course, you can add instances of different vertexes to the same compute set,
+so different workers could be running different code. In this case 
+checking for tile imbalance is particularly important.
+
 There's not much problem with *oversubscribing* vertex instances to tiles either - in that
 case they are just scheduled in a time-sliced fashion. But it helps if the 
 number of workers is divisible by 6.
@@ -54,8 +58,26 @@ generate `Copy`s for the intra-tile memory copies between buffers for "neighbour
 tile memory (as opposed to message buffers from other tiles for halo regions from
 actual neighbouring tiles).
 
+
+## When to use this pattern
+If that data you're processing fits in a single tile's memory, you should always aim to schedule 6 workers per tile for maximum utilisation,
+especially if you've already spread other computation over other tiles. Communication between workers
+on the same tile is cheaper than on remote tiles or remote IPUs (it's just a 
+`memcpy`).
+
+Scheduling multiple vertexes in this way is best used when data for each thread
+is independent and can be sliced with no overhead. 
+
+Note that, if your work is just to process some shared data structure 6 times as fast, i.e. with each
+thread doing some part of the structure, or if workers could
+determine for themselves based on their `workerId` what part of the shared structure is
+theirs to process (a bit like in an MPI program where knowing your rank tells you
+what you should be doing), then rather consider using a `MultiVertex` as
+described in [Scheduling multiple workers that share data](../scheduling-multiple-workers-that-share-data).
+
+
 ## Notes
-* Make code future-proof by using the `getNumWorkers()` function on the device API
+* Make code future-proof by using the `poplar::Target::getNumWorkerContexts()` function on the device API
 rather than hard-coding for 6 workers.
 * You can always write your program to start off with a version that allocates
 one worker per tile, then, with very little code change, make it use all 6 workers

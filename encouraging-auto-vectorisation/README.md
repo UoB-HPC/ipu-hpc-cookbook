@@ -77,3 +77,9 @@ which produces
 The second case has been optimised to use 64-bit loads and stores (`st64` vs `st32`),
 which doubles the memory bandwidth achieved. Both examples now use width-2 SIMD float vector intructions (`f32v2add`)
 vs the unvectorised (`f32add`) form.
+
+
+## See also:
+Proper data alignment and specifying `restrict`ions on src and dest arrays, as well
+as adding constraints for memory bank placement can all affect good vectorisation. See
+the writeup in [Data alignment](../alignment).
