@@ -19,7 +19,7 @@ When you use the `VectorLayout::ONE_PTR` scheme, the `size()` method isn't
 available on vectors, so you need to add another field where you set the
 size during wiring.
 
-Our default is to use  ` Input<Vector<char, VectorLayout::ONE_PTR, 8>> ;` and
+Our default is to use  ` Input<Vector<WHATEVERTYPE, VectorLayout::ONE_PTR, 8>> ;` and
 provide the size during wiring:
 ```C++
   auto v = graph.addVertex(computeSet, "TheVertex",
@@ -29,6 +29,8 @@ provide the size during wiring:
                                  });
   graph.setInitialValue(v["b_size"], tensors["b"].shape()[0])
 ```
+then optimise for compression scheme and perhaps smaller MinAligns later.
+
 ## Telling `popc` about `__restrict__`ed vectors
 Use the `poplar::constraint` directive during Vertex class definition:
 ```C++

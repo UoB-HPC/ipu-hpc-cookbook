@@ -33,7 +33,7 @@ IDE autocomplete,
 
 ours is
 
-```
+```sh
 POPLAR_ROOT=/home/thorbenl/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64
 CMAKE_PREFIX_PATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64;
 LIBRARY_PATH=/home/your_username/poplar_sdk/popart-ubuntu_18_04-2.0.0+108156-165bbd8a64/lib:/home/your_username/poplar_sdk/poplar-ubuntu_18_04-2.0.0+108156-165bbd8a64/lib;

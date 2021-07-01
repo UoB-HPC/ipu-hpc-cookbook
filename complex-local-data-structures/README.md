@@ -90,7 +90,19 @@ public:
 * The vertex is just wired up with `char` and the buffer is pre-allocated to
   be a chunk of tile memory (static size)
   
+## Dynamic memory
+Tile executables don't support dynamic memory (i.e. there's no heap), and 
+you can't use `malloc` or `new`. This makes implementing some structures awkward:
+you essentially have to implement these using offsets into a `char` vector or,
+possibly implementing a custom allocator (like https://stackoverflow.com/questions/771458/improvements-for-this-c-stack-allocator),
+although we haven't done this yet.
 
-```
+Our strategy in some complex cases has been to grab an area of memory using an
+"InOut" Vector of chars, aligned to an 8-byte boundary, and then cast that as 
+above to whatever complex data structure we want to use. We grab a big chunk
+and then are responsible for making sure that our structure doesn't grow bigger
+than the chunk size, so have to manually keep track of its size. This approach
+works fairly well when the structure can be changed in a thread-safe way and
+can be combined with MultiVertexes (see [Scheduling Multiple Workers that share data](../scheduling-multiple-workers-that-share-data)),
+such as for OctTrees z-ordering maps in particle simulations.
 
-```

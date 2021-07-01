@@ -24,7 +24,7 @@ the same with one thread in one pass), but it demonstrates the concept nicely.
 class CalculateColourSum : public MultiVertex {
 public:
   Input<Vector<float>> input;
-  Input<Vector<unsigne int>> colours;
+  Input<Vector<unsigned int>> colours;
   Output<Vector<float>> colourSums;
 
   bool compute(unsigned workerId) {

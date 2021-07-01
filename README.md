@@ -160,8 +160,8 @@ recipe shows various approaches to avoiding this problem.
 
 ### Representing complex local data structures
 Poplar's codelets take scalar or (up to 2-dimensional) vector inputs,
-but sometimes your data is more complex (e.g. a tree). Codelets also support
-have dynamic (heap) memory, making familiar data structures hard to implement. In [Representing complex
+but sometimes your data is more complex (e.g. a tree). Codelets also lack support
+for dynamic (heap) memory, making familiar data structures hard to implement. In [Representing complex
 local data structures](complex-local-data-structures) we look at some approaches to this problem.
 
 ## Assembly vertexes

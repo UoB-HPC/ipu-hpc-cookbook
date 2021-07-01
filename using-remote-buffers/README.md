@@ -86,7 +86,8 @@ rather than doing it all at once.
 
 We start off initialising the values in each of our 'rows' to the value of the row (so all values in row 13 are `13` to begin with).
 
-```C++ auto dataInKernelMemory = new int[NumElemsToTransfer];
+```C++ 
+    auto dataInKernelMemory = new int[NumElemsToTransfer];
     auto fillBufferWith = [&dataInKernelMemory](const int val) -> auto {
         for (int i = 0; i < (int) NumElemsToTransfer; i++) {
             dataInKernelMemory[i] = val;
@@ -102,7 +103,7 @@ Similarly, when the computation is done, we need to retrieve the values from the
 in system memory (summarise them, write the result to a file, etc.)
 
 In our demo program, we just check the results have the expected value (row+1):
-```
+```C++
 for (auto i = 0; i < NumDataRepeats; i++) {
         engine.copyFromRemoteBuffer(remoteBuffer0, dataInKernelMemory, i);
         ipu::assertThat("chunk " + std::to_string(i) + " remoteBuffer 0 did not have the expected value everywhere",

@@ -66,7 +66,7 @@ the use of `...v2` or `..v4` instructions like `f16v4add` or `f32v2add`
                                                                                                like `st32` or `ld64`
 * whether instruction bundles are being generated (where the FP and int/memory pipelines each process an instruction in parallel), which you
   can tell from the presence of pairs of instructions in `{}`s, like 
-  ```
+  ```asm
         {
                 ldb16step $a1, $m15, $m8+=, 1
                 or $a0, $a0, 1006632960

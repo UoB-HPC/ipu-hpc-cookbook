@@ -24,7 +24,7 @@ Even if it's not immediately apparent in the API documentation, the `popc` compi
 comes with some [intrinsic functions](https://en.wikipedia.org/wiki/Intrinsic_function) that might be exposing the functionality you need.
 
 You can inspect the intrinsics by looking at the strings in the `libpoplar.so` library. For example, in SDK v1.4
-```bash
+```sh
 > strings libpoplar.so | grep '__builtin_ipu' | sort -u 
 
 __builtin_ipu_f32atan
