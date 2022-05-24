@@ -103,22 +103,6 @@ auto initialiseTileData(char *buf, const size_t numProcessors, const size_t MemS
     }
 }
 
-auto captureProfileInfo(Engine &engine) {
-    std::ofstream graphOfs;
-    graphOfs.open("graph.json", std::ofstream::out | std::ofstream::trunc);
-
-    std::ofstream executionOfs;
-    executionOfs.open("execution.json", std::ofstream::out | std::ofstream::trunc);
-
-    serializeToJSON(graphOfs, engine.getGraphProfile(), false);
-    serializeToJSON(executionOfs, engine.getExecutionProfile(), false);
-
-    graphOfs.close();
-    executionOfs.close();
-
-
-}
-
 template<typename T>
 auto norm2(T a, T b) -> T {
     return a * a + b * b;
@@ -247,10 +231,10 @@ int main() {
                     {"hasParticlesToShed", hasParticlesToShed[tileNum]}
 
             });
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tileNum);
         }
-        findAlienParticle = Execute(cs);
+        findAlienParticle.add(Execute(cs));
     }
 
 
@@ -263,7 +247,7 @@ int main() {
                                              {"data",           memories[tileNum]},
                                              {"particleToShed", particleToShed[tileNum]}
                                      });
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tileNum);
         }
         exchangeParticles.add(Execute(csOffer));
@@ -340,7 +324,7 @@ int main() {
                                              {"isOfferingParticle",    isOfferingSlices},
                                      });
             graph.setInitialValue(v["numNeighbours"], neighbours.size());
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tileNum);
         }
         exchangeParticles.add(Execute(csAccept));
@@ -353,7 +337,7 @@ int main() {
                                              {"hasParticlesToShed", hasParticlesToShed[tileNum]}
 
                                      });
-            graph.setCycleEstimate(v, 100);
+            graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tileNum);
         }
         exchangeParticles.add(Execute(csFindNext));
@@ -378,18 +362,18 @@ int main() {
                                  {
                                          {"data", memories[tileNum]},
                                  });
-        graph.setCycleEstimate(v,100);
+        graph.setPerfEstimate(v,100);
         graph.setTileMapping(v, tileNum);
     }
     Sequence updateParticlePositions;
     updateParticlePositions.add(Execute(updatePositionsCs));
     updateParticlePositions.add(Execute(updateTimestepCs));
 
-    Sequence loopUntilAllParticlesExchanged = RepeatWhileTrue(
+    Sequence loopUntilAllParticlesExchanged{RepeatWhileTrue(
             reduceHasParticlesToShed,
             stillParticlesToShed,
             exchangeParticles
-    );
+    )};
     const auto memoryOut = graph.addDeviceToHostFIFO("<<data", CHAR,
                                                      NUM_PROCESSORS * MaxMem);
     const auto memoryIn = graph.addHostToDeviceFIFO(">>data", CHAR,
@@ -450,14 +434,12 @@ int main() {
         std::cout << "Running iteration " << iter << ":" << std::endl;
         tic = std::chrono::high_resolution_clock::now();
         if (iter == 2) {
-            engine.resetExecutionProfile();
             engine.enableExecutionProfiling();
 
         }
         engine.run(1);
         if (iter == 2) {
             engine.disableExecutionProfiling();
-            captureProfileInfo(engine);
         }
 
         toc = std::chrono::high_resolution_clock::now();

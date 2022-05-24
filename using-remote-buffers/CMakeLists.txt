@@ -21,4 +21,5 @@ endif()
 
 find_package(poplar REQUIRED)
 include_directories(include)
+include_directories(../common)
 add_subdirectory(src)
