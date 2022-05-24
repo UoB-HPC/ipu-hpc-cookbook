@@ -110,21 +110,6 @@ auto serializeGraph(const Graph &graph) {
     graphSerOfs.close();
 }
 
-auto captureProfileInfo(Engine &engine) {
-    std::ofstream graphOfs;
-    graphOfs.open("graph.json", std::ofstream::out | std::ofstream::trunc);
-
-    std::ofstream executionOfs;
-    executionOfs.open("execution.json", std::ofstream::out | std::ofstream::trunc);
-
-    serializeToJSON(graphOfs, engine.getGraphProfile(), false);
-    serializeToJSON(executionOfs, engine.getExecutionProfile(), false);
-
-    graphOfs.close();
-    executionOfs.close();
-}
-
-
 int main(int argc, char *argv[]) {
     std::cout << "STEP 1: Connecting to an IPU device" << std::endl;
     auto device = getIpuDevice(1);
@@ -186,7 +171,6 @@ int main(int argc, char *argv[]) {
 
     std::cout << "STEP 9: Capture debug and profile info" << std::endl;
     serializeGraph(graph);
-    captureProfileInfo(engine);
     engine.printProfileSummary(std::cout,
                                OptionFlags{{"showExecutionSteps", "false"}});
 

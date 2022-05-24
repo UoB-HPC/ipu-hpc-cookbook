@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
 
     Sequence initProgram = initialise(graph, tensors);
 
-    Sequence timestepProgram = Repeat{20, Sequence{haloExchange(graph, tensors), stencil(graph, tensors)}};
+    Program timestepProgram = Repeat{20, Sequence{haloExchange(graph, tensors), stencil(graph, tensors)}};
 
     std::cout << "Compiling..." <<
               std::endl;
@@ -352,7 +352,6 @@ int main(int argc, char *argv[]) {
     for (int iter = 1; iter <= MaxIters; iter++) {
         std::cout << "Running iteration " << iter << ":" << std::endl;
         if (iter == 2) {
-            engine.resetExecutionProfile();
             engine.enableExecutionProfiling();
 
         }
@@ -361,7 +360,6 @@ int main(int argc, char *argv[]) {
         toc = std::chrono::high_resolution_clock::now();
         if (iter == 2) {
             engine.disableExecutionProfiling();
-            ipu::captureProfileInfo(engine);
         }
 
 

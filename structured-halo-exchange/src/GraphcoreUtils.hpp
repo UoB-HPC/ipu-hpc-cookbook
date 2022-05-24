@@ -49,22 +49,6 @@ namespace utils {
         graphSerOfs.close();
     }
 
-    auto captureProfileInfo(Engine &engine) {
-        std::ofstream graphOfs;
-        graphOfs.open("graph.json", std::ofstream::out | std::ofstream::trunc);
-
-        std::ofstream executionOfs;
-        executionOfs.open("execution.json", std::ofstream::out | std::ofstream::trunc);
-
-        serializeToJSON(graphOfs, engine.getGraphProfile(), false);
-        serializeToJSON(executionOfs, engine.getExecutionProfile(), false);
-
-        graphOfs.close();
-        executionOfs.close();
-
-
-    }
-
     auto getIpuDevice(unsigned int numIpus = 1) -> std::optional <Device> {
         DeviceManager manager = DeviceManager::createDeviceManager();
 
