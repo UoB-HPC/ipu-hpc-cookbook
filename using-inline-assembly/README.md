@@ -2,7 +2,7 @@
 This recipe shows you how you might write some IPU assembly inline in a C++ vertex, by using `popc`'s support for the
 extended assembly (`__asm`) syntax.
 
-Before you start writing IPU assembly, make sure you've read the [Poplar Vertex Assembly Programming Guide](https://docs.graphcore.ai/projects/assembly-programming/), 
+Before you start writing IPU assembly, make sure you've read the [Poplar Vertex Assembly Programming Guide](https://docs.graphcore.ai/projects/assembly-programming/en/latest/hints_tips.html),
 and have access to the Tile Worker ISA (which explains
 the instructions that are availbale.) 
 

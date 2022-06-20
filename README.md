@@ -175,7 +175,7 @@ will be portable to other platforms, and you'll need to go to extra lengths to t
 and make sure it's correct. Is this really the right thing for you to be doing for your application?
 
 There are lots of assembly vertex examples in the open poplibs SDK code, and
-there's the excellent [Vertex assembly programming guide](https://docs.graphcore.ai/projects/assembly-programming/en/latest/index.html) from Graphcore.
+there's the excellent [Vertex assembly programming guide](https://docs.graphcore.ai/projects/poplar-user-guide/en/latest/asm_vertices.html) from Graphcore.
 Note that to make any real headway without guessing instruction formats, you'll need access to the IPU's ISA Specification
 (<cite>[Graphcore Tile Worker ISA](#references)</cite>), which as far as we know,
 isn't generally publicly available, so you need to contact Graphcore for a copy.
@@ -271,3 +271,4 @@ with Poplar's compiled communication approach, but we show one way to work aroun
 
 # Acknowledgements
 Some of the examples use Jarryd Beck's [cxxopts](https://github.com/jarro2783/cxxopts) library for options parsing.
+

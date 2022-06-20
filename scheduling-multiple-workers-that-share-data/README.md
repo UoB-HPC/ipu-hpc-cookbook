@@ -6,7 +6,7 @@ assembly to launch supervisor Vertexes, but since SDK v2.1 there are new `MultiV
 that make this task trivial.
 
 See the docs at 
-https://docs.graphcore.ai/projects/assembly-programming/en/latest/vertices_overview.html#multivertex-worker-threads
+https://docs.graphcore.ai/projects/poplar-user-guide/en/latest/vertices_overview.html#id3
 for details of `MultiVertexes`.
 
 In this example, let's consider a data structure where we have an input array,

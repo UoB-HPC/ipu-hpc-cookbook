@@ -3,4 +3,5 @@
 There's actually a Graphcore tutorial for this now, so we'll just redirect you
 to that:
 
-https://github.com/graphcore/examples/tree/master/code_examples/poplar/prefetch
+https://github.com/graphcore/tutorials/tree/master/feature_examples/poplar/prefetch
+

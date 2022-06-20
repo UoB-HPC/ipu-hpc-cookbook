@@ -95,7 +95,7 @@ We start off initialising the values in each of our 'rows' to the value of the r
     };
     for (auto i = 0; i < NumDataRepeats; i++) {
         fillBufferWith(i);
-        engine.copyToRemoteBuffer(dataInKernelMemory, remoteBuffer0, i);
+        engine.copyToRemoteBuffer(dataInKernelMemory, remoteBuffer0.handle(), i);
     }
 ```
 
@@ -105,7 +105,7 @@ in system memory (summarise them, write the result to a file, etc.)
 In our demo program, we just check the results have the expected value (row+1):
 ```C++
 for (auto i = 0; i < NumDataRepeats; i++) {
-        engine.copyFromRemoteBuffer(remoteBuffer0, dataInKernelMemory, i);
+        engine.copyFromRemoteBuffer(remoteBuffer0.handle(), dataInKernelMemory, i);
         ipu::assertThat("chunk " + std::to_string(i) + " remoteBuffer 0 did not have the expected value everywhere",
                         everyValueInChunkIs(i + 1));
 }
