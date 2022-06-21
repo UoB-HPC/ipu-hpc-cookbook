@@ -56,7 +56,7 @@ won't be very helpful to you.
 We assume that you've downloaded and installed the Graphcore SDK from https://www.graphcore.ai/developer,
 and have read Graphcore's own excellent documentation before starting here. Especially make sure that
 you've read the _Poplar and Poplibs User Guide_ (https://docs.graphcore.ai/projects/poplar-user-guide/en/latest/),
-and followed the basic Poplar tutorials at https://github.com/graphcore/examples/tree/master/tutorials.
+and followed the basic Poplar tutorials at https://github.com/graphcore/tutorials.
 
 We also recommend bookmarking the API documentation (https://docs.graphcore.ai/projects/poplar-api/en/latest/): you're
 going to be looking at it often!
