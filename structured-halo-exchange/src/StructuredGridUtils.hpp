@@ -87,7 +87,7 @@ namespace grids {
         }
     };
 
-    constexpr auto DefaultNumTilesPerIpu = 1216u;
+    constexpr auto DefaultNumTilesPerIpu = 1472u;
     constexpr auto DefaultNumWorkersPerTile = 6u;
     constexpr auto DefaultMinRowsPerTile = 6u;
     constexpr auto DefaultMinColsPerTile = 6u;

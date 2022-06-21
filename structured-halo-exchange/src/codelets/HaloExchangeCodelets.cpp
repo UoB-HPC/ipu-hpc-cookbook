@@ -88,10 +88,10 @@ public:
 class UnpackHaloAll : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
+    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
 
     bool compute() {
-        auto tileData = asTileData(&data[0]);
+        auto tileData = asTileData((void*)&data[0]);
         auto cells = tileData->cells;
         const auto in = reinterpret_cast<const FromNeighboursHalo *>(&halo[0]);
         const auto nc = tileData->numCols;
@@ -130,10 +130,10 @@ public:
 class UnpackHalo : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
+    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
 
     bool compute() {
-        auto tileData = asTileData(&data[0]);
+        auto tileData = asTileData((void*)&data[0]);
         auto cells = tileData->cells;
         const auto in = reinterpret_cast<const FromNeighboursHalo *>(&halo[0]);
         const auto nc = tileData->numCols;
@@ -171,10 +171,10 @@ public:
 class UnpackHaloBottom : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write to it
+    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write to it
 
     bool compute() {
-        auto tileData = asTileData(&data[0]);
+        auto tileData = asTileData((void*)&data[0]);
         auto cells = tileData->cells;
         const auto in = reinterpret_cast<const FromNeighboursHalo *>(&halo[0]);
         const auto nc = tileData->numCols;
@@ -196,11 +196,11 @@ public:
 class UnpackHaloTop : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // We mark as input but actually we are going to be
+    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // We mark as input but actually we are going to be
     // naughty and write to it
 
     bool compute() {
-        auto tileData = asTileData(&data[0]);
+        auto tileData = asTileData((void*)&data[0]);
         auto cells = tileData->cells;
         const auto in = reinterpret_cast<const FromNeighboursHalo *>(&halo[0]);
         const auto nc = tileData->numCols;
@@ -227,12 +227,12 @@ public:
 
 class Stencil : public Vertex {
 public:
-    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We write to it even though it's an input
+    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We write to it even though it's an input
     int threadRowFrom;
     int threadRowTo;
 
     bool compute() {
-        auto tileData = asTileData(&data[0]);
+        auto tileData = asTileData((void*)&data[0]);
         auto cells = tileData->cells;
 
         const auto nc = tileData->numCols;

@@ -222,7 +222,7 @@ an only needs to communicate with its neighbours for data on the "borders".
 ### Halo exchange
 When border data needs to be communicated between workers, the common method is
 to use ghost cells that contain a copy of another workers' cells in a border region, and
-and synchronise these using a pattern known as 'halo exchange'. We show how to implement
+synchronise these using a pattern known as 'halo exchange'. We show how to implement
 this in the [Structured Halo Exchange](structured-halo-exchange/) recipe.
 
 

@@ -37,7 +37,7 @@ namespace utils {
     auto getIpuModel(const unsigned short numIpus = 1) -> std::optional <Device> {
         IPUModel ipuModel;
         ipuModel.numIPUs = numIpus;
-        ipuModel.tilesPerIPU = 1216;
+        ipuModel.tilesPerIPU = 1472;
         return {ipuModel.createDevice()};
     }
 

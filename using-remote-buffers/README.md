@@ -1,7 +1,8 @@
 # RemoteBuffers
 
 The IPU has an extraordinary amount of the chip's transistors devoted to on-chip SRAM memory: much more than any
-other chip of its size. For example, each of the 1216 cores on a MK-1 IPU has a local 256KiB on-chip memory. 
+other chip of its size. For example, each of the 1216 cores on a MK-1 IPU has a local 256KiB on-chip memory.
+In case of MK-2 there are 1472 cores, each with 624KiB on-chip SRAM memory.
 We can think of the performance of this memory as equivalent to caches in a CPU, or 
 shared memory on a GPU. So it's blazingly fast, and we want to be using it as much as possible. 
 
@@ -34,7 +35,7 @@ contention over the PCIe links and allows us to overlap communication and comput
 
 In this case, our data will be a whole bunch of `int`s that we just want to increment in parallel.
 Since this program is about showing the remote buffers, we don't actually do anything clever during the processing: in fact, we
-just launch one worker per core. An optimised version would be using 6 workers for each of the 1216 x 2 cores, and processing
+just launch one worker per core. An optimised version would be using 6 workers for each of the 1472 x 2 cores, and processing
 64-bit register-wide `int2`s to maximise the memory bandwidth. (i.e. we could be processing almost 30,000 `int`s in parallel
 on 2 IPUs).  
 

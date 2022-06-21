@@ -30,7 +30,7 @@ using namespace poplar::program;
 const auto MaxIters = 200;
 const auto NumCellElements = 1; //Data structure is just 1 float per cell in this demo
 const auto NumIpus = 1;
-const auto TotalNumTilesToUse = 1216 * NumIpus;
+const auto TotalNumTilesToUse = 1472 * NumIpus;
 const int NumWorkers = 6;
 
 static_assert(TotalNumTilesToUse % NumIpus == 0);
@@ -339,6 +339,8 @@ int main(int argc, char *argv[]) {
     auto dataBuf = std::make_unique<std::vector<char>>(BufferSize * TotalNumTilesToUse * 20);
 
     initialiseAllTileData(dataBuf->data(), TotalNumTilesToUse);
+    engine.connectStream(">>data", dataBuf->data());
+    engine.connectStream("<<data", dataBuf->data());
     std::cout << "Sending initial data..." <<
               std::endl;
     engine.run(0); // Copy to device
