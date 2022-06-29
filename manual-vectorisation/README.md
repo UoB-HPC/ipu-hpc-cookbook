@@ -22,7 +22,7 @@ typedef int int4 __attribute__((vector_size(sizeof(int) * 4)));
 ```
 
 It is also worth inspecting the math functions available in `lib/graphcore/include/__vector_math.h`
-such as 
+such as
 ```C++
 half4 half4_fma(half4 x, half4 y, half4 z);
 ...
@@ -55,17 +55,17 @@ public:
     int size;
 
     auto compute() -> bool {
-        auto dataAsHalf4 = reinterpret_cast<half4 *>(&data);
+        auto dataAsHalf4 = reinterpret_cast<half4 *>(&data[0]);
         for (auto i = 0; i < size / 4; i++) {
           half4 toAdd = {howMuchToAdd, howMuchToAdd, howMuchToAdd, howMuchToAdd};
           dataAsHalf4[i] += toAdd;
         }
-    return true;    
+    return true;
     }
 };
 ```
 
-Without any optimisation applied (`-O0`) we see 
+Without any optimisation applied (`-O0`) we see
 that the `WithoutSimd` uses 32-bit vectorised `v162add` instructions, and 32-bit loads
 and stores (in conjunction with `ldb16`) for the float16 parts.
 
