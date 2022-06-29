@@ -17,7 +17,7 @@
 
 using namespace poplar;
 
-inline auto asTileData(void *ref) -> TileData *const {
+inline auto asTileData(void *ref) -> TileData *const{
     return reinterpret_cast<TileData *const>(ref);
 }
 
@@ -52,7 +52,7 @@ public:
 class PackHalo : public Vertex {
 public:
     Output <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data;
+    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data;
 
     bool compute() {
         auto tileData = asTileData(&data[0]);
@@ -88,7 +88,7 @@ public:
 class UnpackHaloAll : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
+    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
 
     bool compute() {
         auto tileData = asTileData(&data[0]);
@@ -130,7 +130,7 @@ public:
 class UnpackHalo : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
+    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write
 
     bool compute() {
         auto tileData = asTileData(&data[0]);
@@ -171,7 +171,7 @@ public:
 class UnpackHaloBottom : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write to it
+    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We actually write to it
 
     bool compute() {
         auto tileData = asTileData(&data[0]);
@@ -196,7 +196,7 @@ public:
 class UnpackHaloTop : public Vertex {
 public:
     Input <Vector<float, VectorLayout::ONE_PTR, 8>> halo;
-    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // We mark as input but actually we are going to be
+    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // We mark as input but actually we are going to be
     // naughty and write to it
 
     bool compute() {
@@ -227,7 +227,7 @@ public:
 
 class Stencil : public Vertex {
 public:
-    Input <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We write to it even though it's an input
+    InOut <Vector<char, VectorLayout::ONE_PTR, 8>> data; // Naughty! We write to it even though it's an input
     int threadRowFrom;
     int threadRowTo;
 

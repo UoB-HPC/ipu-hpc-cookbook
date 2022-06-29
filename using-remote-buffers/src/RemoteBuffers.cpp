@@ -123,9 +123,9 @@ int main() {
     };
     for (auto i = 0; i < NumDataRepeats; i++) {
         fillBufferWith(i);
-        engine.copyToRemoteBuffer(dataInKernelMemory, remoteBuffer0, i);
+        engine.copyToRemoteBuffer(dataInKernelMemory, remoteBuffer0.handle(), i);
         fillBufferWith(100 + i);
-        engine.copyToRemoteBuffer(dataInKernelMemory, remoteBuffer1, i);
+        engine.copyToRemoteBuffer(dataInKernelMemory, remoteBuffer1.handle(), i);
     }
 
     engine.disableExecutionProfiling();
@@ -152,10 +152,10 @@ int main() {
 //    );
 
     for (auto i = 0; i < NumDataRepeats; i++) {
-        engine.copyFromRemoteBuffer(remoteBuffer0, dataInKernelMemory, i);
+        engine.copyFromRemoteBuffer(remoteBuffer0.handle(), dataInKernelMemory, i);
         ipu::assertThat("chunk " + std::to_string(i) + " remoteBuffer 0 did not have the expected value everywhere",
                         everyValueInChunkIs(i + 1));
-        engine.copyFromRemoteBuffer(remoteBuffer1, dataInKernelMemory, i);
+        engine.copyFromRemoteBuffer(remoteBuffer1.handle(), dataInKernelMemory, i);
         ipu::assertThat("chunk " + std::to_string(i) + " remoteBuffer 1 did not have the expected value everywhere",
                         everyValueInChunkIs(101 + i));
     }

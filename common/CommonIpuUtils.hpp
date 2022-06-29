@@ -46,20 +46,6 @@ namespace ipu {
         return nullopt;
     }
 
-    auto captureProfileInfo(Engine &engine) {
-        ofstream graphOfs;
-        graphOfs.open("graph.json", ofstream::out | ofstream::trunc);
-
-        ofstream executionOfs;
-        executionOfs.open("execution.json", ofstream::out | ofstream::trunc);
-
-        serializeToJSON(graphOfs, engine.getGraphProfile(), false);
-        serializeToJSON(executionOfs, engine.getExecutionProfile(), false);
-
-        graphOfs.close();
-        executionOfs.close();
-    }
-
     const auto POPLAR_ENGINE_OPTIONS_DEBUG = OptionFlags{
             {"target.saveArchive",                "archive.a"},
             {"debug.instrument",                  "true"},

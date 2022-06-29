@@ -154,7 +154,7 @@ auto implicitStrategy(Graph &graph, const unsigned numTiles,
             graph.setPerfEstimate(v, 100);
             graph.setTileMapping(v, tile);
         }
-        return Sequence(Execute(compute1), Execute(compute2));
+        return Sequence{Execute(compute1), Execute(compute2)};
     };
 
     return {Execute(initCs), Repeat{numIters, stencilProgram()}};
@@ -339,7 +339,7 @@ auto explicitManyTensorStrategy(Graph &graph, const unsigned numTiles,
         }
 
 
-        return Sequence(haloExchange1, Execute(compute1), haloExchange2, Execute(compute2));
+        return Sequence{haloExchange1, Execute(compute1), haloExchange2, Execute(compute2)};
     };
     Sequence printTensors;
     for (auto i = 0u; i < numTiles; i++) {
@@ -469,7 +469,7 @@ auto explicitOneTensorStrategy2Wave(Graph &graph, const unsigned numTiles,
                                                   {myGhostBottomRow + 1, myGhostLeftCol + 1})));
                 }
             }
-            return Sequence(northSouthWave, eastWestWave);
+            return Sequence{northSouthWave, eastWestWave};
         };
 
         auto haloExchange1 = haloExchangeFn(expandedIn);
@@ -508,7 +508,7 @@ auto explicitOneTensorStrategy2Wave(Graph &graph, const unsigned numTiles,
         }
 
 
-        return Sequence(haloExchange1, Execute(compute1), haloExchange2, Execute(compute2));
+        return Sequence{haloExchange1, Execute(compute1), haloExchange2, Execute(compute2)};
     };
     return {Sequence{initialiseProgram, Execute(initialiseCs)},
             Repeat{numIters, stencilProgram()}
@@ -727,7 +727,7 @@ auto explicitOneTensorStrategy(Graph &graph, const unsigned numTiles,
         }
 
 
-        return Sequence(haloExchange1, Execute(compute1), haloExchange2, Execute(compute2));
+        return Sequence{haloExchange1, Execute(compute1), haloExchange2, Execute(compute2)};
     };
     return {Sequence{initialiseProgram, Execute(initialiseCs)},
             Repeat{numIters, stencilProgram()}
@@ -879,8 +879,6 @@ int main(int argc, char *argv[]) {
 
 
         if (debug) {
-            utils::captureProfileInfo(engine);
-
             engine.printProfileSummary(std::cout,
                                        OptionFlags{{"showExecutionSteps", "false"}});
         }

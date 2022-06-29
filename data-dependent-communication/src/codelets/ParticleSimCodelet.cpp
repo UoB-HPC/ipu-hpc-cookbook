@@ -41,7 +41,7 @@ inline auto findNextToShed(TileData &tileData) -> bool {
 class FindFirstAlienParticle : public Vertex {
 
 public:
-    Input <Vector<char, VectorLayout::ONE_PTR>> data;
+    InOut <Vector<char, VectorLayout::ONE_PTR>> data;
     Output<bool> hasParticlesToShed;
 
     bool compute() {
@@ -59,7 +59,7 @@ public:
 class FindNextAlienParticle : public Vertex {
 
 public:
-    Input <Vector<char, VectorLayout::ONE_PTR>> data;
+    InOut <Vector<char, VectorLayout::ONE_PTR>> data;
     Output<bool> hasParticlesToShed;
 
     bool compute() {
@@ -172,7 +172,7 @@ public:
 
         auto tileData = asTileData(&data[0]);
         const auto particles = tileData->particles;
-        auto maybeParticles = reinterpret_cast<Particle *>(&potentialNewParticles[0]);
+        auto maybeParticles = reinterpret_cast<Particle *>(const_cast<float*>(&potentialNewParticles[0]));
         const auto extra_x = 0;//(tileData->local.max.x - tileData->local.min.x)*.05;
         const auto extra_y = 0;//(tileData->local.max.y - tileData->local.min.y)*.05;
 
